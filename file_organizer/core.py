@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import List, Tuple
 
 
-def scan_directory(directory: Path) -> List[Path]:
+def scan_directory(directory: Path) -> List:
     """
     Рекурсивно сканирует директорию и возвращает список всех файлов и папок.
     
@@ -12,7 +12,7 @@ def scan_directory(directory: Path) -> List[Path]:
     Returns:
         Список путей Path ко всем файлам и папкам
     """
-    # TODO: Реализовать
+
     if not directory.exists():
         raise FileNotFoundError(f"Директория не существует: {directory}")
     if not directory.is_dir():
@@ -23,7 +23,6 @@ def scan_directory(directory: Path) -> List[Path]:
         result.append(path)
 
     return result
-    # raise NotImplementedError("Функция пока не реализована")
 
 
 def rename_files(directory: Path, search: str, replace: str) -> List[Tuple[Path, Path]]:
@@ -38,9 +37,12 @@ def rename_files(directory: Path, search: str, replace: str) -> List[Tuple[Path,
     Returns:
         Список кортежей (старый_путь, новый_путь)
     """
-    # TODO: Реализовать
-    raise NotImplementedError("Функция пока не реализована")
 
+
+    paths_lst = scan_directory(directory)
+ 
+    new_paths_list = [str(i).replace(search, replace) for i in paths_lst if search in str(i)]
+    return [tuple(paths_lst), tuple(new_paths_list)]
 
 def delete_files_by_name(directory: Path, filename: str) -> List[Path]:
     """

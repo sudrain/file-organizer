@@ -1,6 +1,6 @@
 from pathlib import Path
 import pytest
-from file_organizer.core import scan_directory
+from file_organizer.core import scan_directory, rename_files
 
 
 def test_scan_directory_returns_list_of_paths(sample_file_structure):
@@ -39,10 +39,10 @@ def test_scan_directory_empty_dir(temp_dir):
 def test_scan_directory_recursive(sample_file_structure):
     """Рекурсивное сканирование."""
     result = scan_directory(sample_file_structure)
-    
+
     # Должны найти все 7 элементов (4 файла + 3 папки)
     assert len(result) == 7
-    
+
     # Проверяем конкретные пути
     expected_paths = [
         sample_file_structure / "file1.txt",
@@ -72,3 +72,10 @@ def test_scan_directory_not_a_directory(temp_dir):
     
     with pytest.raises(NotADirectoryError):
         scan_directory(file_path)
+
+
+def test_rename_files_basic(sample_file_structure):
+    """Тест: базовое переименование файлов."""
+    result = rename_files(sample_file_structure, "file", "document")
+    assert isinstance(result, list)
+    assert len(result) == 2
