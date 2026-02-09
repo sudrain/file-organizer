@@ -1,4 +1,5 @@
 from pathlib import Path
+import pytest
 from file_organizer.core import scan_directory
 
 
@@ -55,3 +56,19 @@ def test_scan_directory_recursive(sample_file_structure):
     
     for expected in expected_paths:
         assert expected in result
+
+
+def test_scan_directory_nonexistent():
+    """Тест: обработка несуществующей директории."""
+    with pytest.raises(FileNotFoundError):
+        scan_directory(Path("/несуществующая/директория"))
+
+
+def test_scan_directory_not_a_directory(temp_dir):
+    """Тест: обработка когда путь - файл, а не директория."""
+    # Создаем файл
+    file_path = temp_dir / "file.txt"
+    file_path.write_text("test")
+    
+    with pytest.raises(NotADirectoryError):
+        scan_directory(file_path)

@@ -57,5 +57,3 @@ def delete_files_by_name(directory: Path, filename: str) -> List[Path]:
     raise NotImplementedError("Функция пока не реализована")
 
 
-def start(path):
-    return list(path)
