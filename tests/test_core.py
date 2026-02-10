@@ -3,7 +3,7 @@ import pytest
 from file_organizer.core import scan_directory, rename_files
 
 
-def test_scan_directory_returns_list_of_paths(sample_file_structure):
+def test_scan_directory_returns_list_of_paths(sample_file_structure: Path):
     """Функция должна возвращать список путей."""
     result = scan_directory(sample_file_structure)
     
@@ -12,7 +12,7 @@ def test_scan_directory_returns_list_of_paths(sample_file_structure):
     assert all(isinstance(item, Path) for item in result)
 
 
-def test_scan_directory_includes_files(sample_file_structure):
+def test_scan_directory_includes_files(sample_file_structure: Path):
     """Сканирование должно находить файлы."""
     result = scan_directory(sample_file_structure)
     
@@ -21,7 +21,7 @@ def test_scan_directory_includes_files(sample_file_structure):
     assert len(file_paths) == 4  # file1.txt, doc1.txt, old_file.txt
 
 
-def test_scan_directory_includes_folders(sample_file_structure):
+def test_scan_directory_includes_folders(sample_file_structure: Path):
     """Сканирование должно находить папки."""
     result = scan_directory(sample_file_structure)
     
@@ -30,13 +30,13 @@ def test_scan_directory_includes_folders(sample_file_structure):
     assert len(dir_paths) == 3  # docs, backup
 
 
-def test_scan_directory_empty_dir(temp_dir):
+def test_scan_directory_empty_dir(temp_dir: Path):
     """Сканирование пустой директории."""
     result = scan_directory(temp_dir)
     assert result == []
 
 
-def test_scan_directory_recursive(sample_file_structure):
+def test_scan_directory_recursive(sample_file_structure: Path):
     """Рекурсивное сканирование."""
     result = scan_directory(sample_file_structure)
 
@@ -64,7 +64,7 @@ def test_scan_directory_nonexistent():
         scan_directory(Path("/несуществующая/директория"))
 
 
-def test_scan_directory_not_a_directory(temp_dir):
+def test_scan_directory_not_a_directory(temp_dir: Path):
     """Тест: обработка когда путь - файл, а не директория."""
     # Создаем файл
     file_path = temp_dir / "file.txt"
@@ -74,8 +74,21 @@ def test_scan_directory_not_a_directory(temp_dir):
         scan_directory(file_path)
 
 
-def test_rename_files_basic(sample_file_structure):
+def test_rename_files_basic(sample_file_structure: Path):
     """Тест: базовое переименование файлов."""
     result = rename_files(sample_file_structure, "file", "document")
+    old_path = sample_file_structure / "file1.txt"
+    new_path = sample_file_structure / "document1.txt"
+    # Возвращает список
     assert isinstance(result, list)
     assert len(result) == 2
+
+    # Проверяем изменения в возвращенном списке
+    assert old_path in result[0]
+    assert new_path in result[1]
+
+    # Проверяем, что файлы переименованы
+    assert not old_path.exists()
+    assert new_path.exists()
+    assert not (sample_file_structure / "backup" / "old_file.txt").exists()
+    assert (sample_file_structure / "backup" / "old_document.txt").exists()

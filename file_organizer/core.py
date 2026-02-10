@@ -39,10 +39,9 @@ def rename_files(directory: Path, search: str, replace: str) -> List[Tuple[Path,
     """
 
 
-    paths_lst = scan_directory(directory)
- 
-    new_paths_list = [str(i).replace(search, replace) for i in paths_lst if search in str(i)]
-    return [tuple(paths_lst), tuple(new_paths_list)]
+    paths_list = scan_directory(directory)
+    new_paths_list = [i.rename(Path(str(i).replace(search, replace))) for i in paths_list if search in str(i)]
+    return [tuple(paths_list), (new_paths_list)]
 
 def delete_files_by_name(directory: Path, filename: str) -> List[Path]:
     """
