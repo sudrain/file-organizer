@@ -37,10 +37,19 @@ def rename_files(directory: Path, search: str, replace: str) -> List[Tuple[Path,
     Returns:
         Список кортежей (старый_путь, новый_путь)
     """
-
-
+    if len(search) < 1:
+        return []
+    
     paths_list = scan_directory(directory)
-    new_paths_list = [i.rename(Path(str(i).replace(search, replace))) for i in paths_list if search in str(i)]
+    new_paths_list = []
+    for i in paths_list:
+        if search in str(i):
+            new_paths_list.append(i.rename(str(i).replace(search, replace)))
+        else:
+            new_paths_list.append(i)
+
+    if paths_list == new_paths_list:
+        return []
     return [tuple(paths_list), (new_paths_list)]
 
 def delete_files_by_name(directory: Path, filename: str) -> List[Path]:

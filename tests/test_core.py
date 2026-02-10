@@ -82,13 +82,40 @@ def test_rename_files_basic(sample_file_structure: Path):
     # Возвращает список
     assert isinstance(result, list)
     assert len(result) == 2
-
     # Проверяем изменения в возвращенном списке
     assert old_path in result[0]
     assert new_path in result[1]
-
     # Проверяем, что файлы переименованы
     assert not old_path.exists()
     assert new_path.exists()
     assert not (sample_file_structure / "backup" / "old_file.txt").exists()
     assert (sample_file_structure / "backup" / "old_document.txt").exists()
+    # Файл без подстроки "file" не должен измениться
+    assert (sample_file_structure / "docs" / "doc1.txt").exists()
+
+
+def test_rename_files_no_matches(sample_file_structure):
+    """Тест: переименование когда нет совпадений."""
+    result = rename_files(sample_file_structure, "xyz", "abc")
+    assert result == []  # Ничего не должно измениться
+    # Проверяем, что все файлы на месте
+    assert (sample_file_structure / "file1.txt").exists()
+    assert (sample_file_structure / "docs" / "doc1.txt").exists()
+
+
+def test_rename_files_empty_string(sample_file_structure):
+    """Тест: обработка пустых строк."""
+    result = rename_files(sample_file_structure, "", 'asd' )
+    assert result == [] # сейчас возврат пустого списка, без выполнения логики
+
+
+# def test_rename_files_case_sensitive(temp_dir):
+#     """Тест: чувствительность к регистру."""
+#     # Создаем файлы с разным регистром
+#     (temp_dir / "File.txt").write_text("test1")
+#     (temp_dir / "file.txt").write_text("test2")
+#     (temp_dir / "FILE.txt").write_text("test3")
+#     result = rename_files(temp_dir, "file", "document")
+#     result == 1
+#     # Сколько файлов должно переименоваться?
+#     pass  # TODO: Реализовать тест 
