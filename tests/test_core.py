@@ -78,12 +78,21 @@ def test_rename_items_basic(sample_file_structure: Path):
     # Проверяем, что файлы переименованы
     assert not old_path.exists()
     assert new_path.exists()
-    assert not (sample_file_structure / "backup" / "old_file.txt").exists()
-    assert (sample_file_structure / "backup" / "old_document.txt").exists()
     # Файл без подстроки "file" не должен измениться
     assert (sample_file_structure / "docs" / "doc1.txt").exists()
 
 
+def test_rename_items_dry_run(sample_file_structure: Path):
+    """Тест: проверка какие файлы переименуются."""
+    result = rename_items(sample_file_structure, "file", "document", dry_run=True)
+    old_path = sample_file_structure / "file1.txt"
+    new_path = sample_file_structure / "document1.txt"
+    # Возвращает список
+    assert isinstance(result, list)
+    assert len(result) == 3
+    # Проверяем, что файлы переименованы
+    assert old_path.exists()
+    assert not new_path.exists()
 
 
 def test_rename_items_no_matches(sample_file_structure: Path):

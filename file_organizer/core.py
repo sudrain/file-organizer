@@ -25,7 +25,7 @@ def scan_directory(directory: Path) -> List[Path]:
     return sorted(result, key=lambda p: len(p.parents), reverse=True)
 
 
-def rename_items(directory: Path, search: str, replace: str) -> List[Tuple[Path, Path]]:
+def rename_items(directory: Path, search: str, replace: str, dry_run: bool = False) -> List[Tuple[Path, Path]]:
     """
     Рекурсивно переименовывает файлы и папки, заменяя search на replace в именах.
     
@@ -37,9 +37,8 @@ def rename_items(directory: Path, search: str, replace: str) -> List[Tuple[Path,
     Returns:
         Список кортежей (старый_путь, новый_путь) для успешно переименованных элементов.
     """
-    if len(search) < 1 or not isinstance(search, str):
+    if len(search) < 1:
         raise ValueError("Параметр 'search' должен быть строкой с длинной более 0")
-
     
     paths_list = scan_directory(directory)
     changed_paths = []
@@ -54,11 +53,13 @@ def rename_items(directory: Path, search: str, replace: str) -> List[Tuple[Path,
         
         new_path = path.parent / new_name
         if new_path.exists():
-            # Лучше заменить print на логирование позже
+            #заменить print на логирование позже
             print(f"Предупреждение: {new_path} уже существует, пропускаем")
             continue
-        
-        changed_paths.append((path, path.rename(new_path)))
+        if dry_run:
+            changed_paths.append((path, new_path))
+        else:
+            changed_paths.append((path, path.rename(new_path)))
     
     return changed_paths
 
