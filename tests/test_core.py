@@ -1,6 +1,6 @@
 from pathlib import Path
 import pytest
-from file_organizer.core import scan_directory, rename_files
+from file_organizer.core import scan_directory, rename_items
 
 
 def test_scan_directory_returns_list_of_paths(sample_file_structure: Path):
@@ -45,8 +45,8 @@ def test_scan_directory_recursive(sample_file_structure: Path):
         sample_file_structure / "docs" / "doc1.txt",
         sample_file_structure / "backup",
         sample_file_structure / "backup" / "old_file.txt",
-        sample_file_structure / "backup" / "backup_nested",
-        sample_file_structure / "backup" / "backup_nested" / "nested_file.txt",
+        sample_file_structure / "backup" / "nested",
+        sample_file_structure / "backup" / "nested" / "nested_file.txt",
     ]
     for expected in expected_paths:
         assert expected in result
@@ -67,17 +67,14 @@ def test_scan_directory_not_a_directory(temp_dir: Path):
         scan_directory(file_path)
 
 
-def test_rename_files_basic(sample_file_structure: Path):
+def test_rename_items_basic(sample_file_structure: Path):
     """Тест: базовое переименование файлов."""
-    result = rename_files(sample_file_structure, "file", "document")
+    result = rename_items(sample_file_structure, "file", "document")
     old_path = sample_file_structure / "file1.txt"
     new_path = sample_file_structure / "document1.txt"
     # Возвращает список
     assert isinstance(result, list)
-    assert len(result) == 2
-    # Проверяем изменения в возвращенном списке
-    assert old_path in result[0]
-    assert new_path in result[1]
+    assert len(result) == 3
     # Проверяем, что файлы переименованы
     assert not old_path.exists()
     assert new_path.exists()
@@ -87,28 +84,29 @@ def test_rename_files_basic(sample_file_structure: Path):
     assert (sample_file_structure / "docs" / "doc1.txt").exists()
 
 
-def test_rename_files_no_matches(sample_file_structure):
+
+
+def test_rename_items_no_matches(sample_file_structure: Path):
     """Тест: переименование когда нет совпадений."""
-    result = rename_files(sample_file_structure, "xyz", "abc")
+    result = rename_items(sample_file_structure, "xyz", "abc")
     assert result == []  # Ничего не должно измениться
     # Проверяем, что все файлы на месте
     assert (sample_file_structure / "file1.txt").exists()
     assert (sample_file_structure / "docs" / "doc1.txt").exists()
 
 
-def test_rename_files_empty_string(sample_file_structure):
+def test_rename_items_empty_string(sample_file_structure: Path):
     """Тест: обработка пустых строк."""
-    result = rename_files(sample_file_structure, "", 'asd' )
-    assert result == [] # сейчас возврат пустого списка, без выполнения логики
+    # result = rename_items(sample_file_structure, "", 'asd' )
+    # assert result == [] # сейчас возврат пустого списка, без выполнения логики
+    with pytest.raises(ValueError):
+        rename_items(sample_file_structure, '', 'asdf')
 
 
-# def test_rename_files_case_sensitive(temp_dir):
-#     """Тест: чувствительность к регистру."""
-#     # Создаем файлы с разным регистром
-#     (temp_dir / "File.txt").write_text("test1")
-#     (temp_dir / "file.txt").write_text("test2")
-#     (temp_dir / "FILE.txt").write_text("test3")
-#     result = rename_files(temp_dir, "file", "document")
-#     result == 1
-#     # Сколько файлов должно переименоваться?
-#     pass  # TODO: Реализовать тест 
+def test_rename_items_duplicate(sample_file_structure: Path):
+    """Тест: обработка если имя занято"""
+    directory_ex = sample_file_structure / "directory"
+    directory_ex.mkdir()
+    result = rename_items(sample_file_structure, "docs", "directory")
+    assert result == []
+    

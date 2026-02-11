@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import List, Tuple
 
 
-def scan_directory(directory: Path) -> List:
+def scan_directory(directory: Path) -> List[Path]:
     """
     Рекурсивно сканирует директорию и возвращает список всех файлов и папок.
     
@@ -22,12 +22,12 @@ def scan_directory(directory: Path) -> List:
     for path in directory.rglob("*"):
         result.append(path)
 
-    return result
+    return sorted(result, key=lambda p: len(p.parents), reverse=True)
 
 
-def rename_files(directory: Path, search: str, replace: str) -> List[Tuple[Path, Path]]:
+def rename_items(directory: Path, search: str, replace: str) -> List[Tuple[Path, Path]]:
     """
-    Рекурсивно переименовывает файлы, заменяя search на replace в именах.
+    Рекурсивно переименовывает файлы и папки, заменяя search на replace в именах.
     
     Args:
         directory: Корневая директория
@@ -35,22 +35,32 @@ def rename_files(directory: Path, search: str, replace: str) -> List[Tuple[Path,
         replace: Подстрока для замены
     
     Returns:
-        Список кортежей (старый_путь, новый_путь)
+        Список кортежей (старый_путь, новый_путь) для успешно переименованных элементов.
     """
-    if len(search) < 1:
-        return []
+    if len(search) < 1 or not isinstance(search, str):
+        raise ValueError("Параметр 'search' должен быть строкой с длинной более 0")
+
     
     paths_list = scan_directory(directory)
-    new_paths_list = []
-    for i in paths_list:
-        if search in str(i):
-            new_paths_list.append(i.rename(str(i).replace(search, replace)))
-        else:
-            new_paths_list.append(i)
-
-    if paths_list == new_paths_list:
-        return []
-    return [tuple(paths_list), (new_paths_list)]
+    changed_paths = []
+    
+    for path in paths_list:
+        if search not in path.name:
+            continue
+        
+        new_name = path.name.replace(search, replace)
+        if new_name == path.name:
+            continue
+        
+        new_path = path.parent / new_name
+        if new_path.exists():
+            # Лучше заменить print на логирование позже
+            print(f"Предупреждение: {new_path} уже существует, пропускаем")
+            continue
+        
+        changed_paths.append((path, path.rename(new_path)))
+    
+    return changed_paths
 
 def delete_files_by_name(directory: Path, filename: str) -> List[Path]:
     """

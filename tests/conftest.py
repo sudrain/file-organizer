@@ -22,6 +22,8 @@ def sample_file_structure(temp_dir: Path):
     │   └── doc1.txt
     └── backup/
         └── old_file.txt
+            nested/
+            └── nested_file.txt
     """
     # Создаем файлы
     (temp_dir / "file1.txt").write_text("content1")
@@ -37,7 +39,7 @@ def sample_file_structure(temp_dir: Path):
     (backup_dir / "old_file.txt").write_text("old content")
 
     # backup nested
-    backup_nested_dir = backup_dir / "backup_nested"
+    backup_nested_dir = backup_dir / "nested"
     backup_nested_dir.mkdir()
     (backup_nested_dir / "nested_file.txt").write_text("nested content")
     
