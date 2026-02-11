@@ -36,6 +36,8 @@ def rename_items(directory: Path, search: str, replace: str, dry_run: bool = Fal
     
     Returns:
         Список кортежей (старый_путь, новый_путь) для успешно переименованных элементов.
+
+    dry_run: Если True, изменения не применяются, только возвращается список (старый_путь, новый_путь)
     """
     if len(search) < 1:
         raise ValueError("Параметр 'search' должен быть строкой с длиной более 0")
