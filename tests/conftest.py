@@ -20,6 +20,8 @@ def sample_file_structure(temp_dir: Path):
     ├── file1.txt
     ├── docs/
     │   └── doc1.txt
+    ├── file_folder/
+    │   └── inner.txt
     └── backup/
         └── old_file.txt
             nested/
@@ -37,6 +39,11 @@ def sample_file_structure(temp_dir: Path):
     backup_dir = temp_dir / "backup"
     backup_dir.mkdir()
     (backup_dir / "old_file.txt").write_text("old content")
+
+    # Создаем подпапку с файлом
+    file_dir = temp_dir / "file_folder"
+    file_dir.mkdir()
+    (file_dir / "inner.txt").write_text("inner content")
 
     # backup nested
     backup_nested_dir = backup_dir / "nested"

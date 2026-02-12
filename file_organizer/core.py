@@ -33,11 +33,10 @@ def rename_items(directory: Path, search: str, replace: str, dry_run: bool = Fal
         directory: Корневая директория
         search: Подстрока для поиска
         replace: Подстрока для замены
+        dry_run: Если True, изменения не применяются, только возвращается список (старый_путь, новый_путь)
     
     Returns:
         Список кортежей (старый_путь, новый_путь) для успешно переименованных элементов.
-
-    dry_run: Если True, изменения не применяются, только возвращается список (старый_путь, новый_путь)
     """
     if len(search) < 1:
         raise ValueError("Параметр 'search' должен быть строкой с длиной более 0")
@@ -76,7 +75,14 @@ def delete_files_by_name(directory: Path, filename: str) -> List[Path]:
     Returns:
         Список путей к удаленным файлам
     """
-    # TODO: Реализовать
-    raise NotImplementedError("Функция пока не реализована")
+    paths_list = scan_directory(directory)
+    deleted_paths = []
+    for path in paths_list:
+        if path.name == filename:
+            deleted_paths.append(path)
+            path.unlink()
+    
+    return deleted_paths
+    
 
 
