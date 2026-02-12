@@ -64,7 +64,7 @@ def rename_items(directory: Path, search: str, replace: str, dry_run: bool = Fal
     
     return changed_paths
 
-def delete_files_by_name(directory: Path, filename: str) -> List[Path]:
+def delete_files_by_name(directory: Path, filename: str, dry_run: bool = False) -> List[Path]:
     """
     Рекурсивно удаляет файлы с указанным именем.
     
@@ -75,11 +75,20 @@ def delete_files_by_name(directory: Path, filename: str) -> List[Path]:
     Returns:
         Список путей к удаленным файлам
     """
+    if len(filename) < 1:
+        raise ValueError("Имя удаляемого файла должно состоять из одного или более символов")
+    
     paths_list = scan_directory(directory)
     deleted_paths = []
+    
     for path in paths_list:
+        if path.is_dir():
+            continue
+
         if path.name == filename:
             deleted_paths.append(path)
+            if dry_run:
+                continue
             path.unlink()
     
     return deleted_paths

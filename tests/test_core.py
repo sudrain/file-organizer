@@ -153,3 +153,22 @@ def test_delete_files_basic(sample_file_structure: Path):
     assert sample_file_structure / "file_delete.txt" in result
     
 
+def test_delete_files_by_name_dry_run(sample_file_structure):
+    result = delete_files_by_name(sample_file_structure, "file1.txt", dry_run=True)
+    assert len(result) == 1
+    assert result[0] == sample_file_structure / "file1.txt"
+    # Файл должен остаться
+    assert (sample_file_structure / "file1.txt").exists()
+
+
+def test_delete_files_by_name_directory_should_not_be_deleted(temp_dir):
+    # Если передано имя папки, функция НЕ должна её удалять
+    (temp_dir / "folder").mkdir()
+    result = delete_files_by_name(temp_dir, "folder")
+    assert result == []
+    assert (temp_dir / "folder").is_dir()
+
+def test_delete_files_empty_string(sample_file_structure: Path):
+    """Тест: обработка пустых строк."""
+    with pytest.raises(ValueError):
+        delete_files_by_name(sample_file_structure, '')
